@@ -7,7 +7,9 @@ part 'launch_model.g.dart';
 class LaunchModel {
   Fairings? fairings;
   Links? links;
+  @JsonKey(name: "static_fire_date_utc")
   String? staticFireDateUtc;
+  @JsonKey(name: "static_fire_date_unix")
   int? staticFireDateUnix;
   bool? net;
   int? window;
@@ -17,14 +19,20 @@ class LaunchModel {
   String? details;
   List<String>? payloads;
   String? launchpad;
+  @JsonKey(name: "flight_number")
   int? flightNumber;
   String? name;
+  @JsonKey(name: "date_utc")
   String? dateUtc;
+  @JsonKey(name: "date_unix")
   int? dateUnix;
+  @JsonKey(name: "date_local")
   String? dateLocal;
+  @JsonKey(name: "date_precision")
   String? datePrecision;
   bool? upcoming;
   List<Cores>? cores;
+  @JsonKey(name: "auto_update")
   bool? autoUpdate;
   bool? tbd;
   String? id;
@@ -62,6 +70,7 @@ class LaunchModel {
 @JsonSerializable()
 class Fairings {
   bool? reused;
+  @JsonKey(name: "recovery_attempt")
   bool? recoveryAttempt;
   bool? recovered;
 
@@ -78,6 +87,7 @@ class Fairings {
 class Links {
   Patch? patch;
   String? webcast;
+  @JsonKey(name: "youtube_id")
   String? youtubeId;
   String? article;
   String? wikipedia;
@@ -126,6 +136,7 @@ class Cores {
   bool? gridfins;
   bool? legs;
   bool? reused;
+  @JsonKey(name: "landing_attempt")
   bool? landingAttempt;
 
   Cores({

@@ -1,9 +1,14 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:space_x_latest_launch/bloc/launch_bloc.dart';
 import 'package:space_x_latest_launch/core/base_manager.dart';
+import 'package:space_x_latest_launch/models/last_launch_model.dart';
+import 'package:space_x_latest_launch/models/launch_model.dart';
 import 'package:space_x_latest_launch/models/launches.dart';
+import 'package:space_x_latest_launch/widgets/latest_launch_card_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -24,13 +29,17 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blueGrey,
       appBar: AppBar(
         //* Color should change with darker color
         //? Maybe you can use theme configration
         backgroundColor: Colors.transparent,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
-        title: Text(BaseManager.baseTitle),
+        title: Text(
+          BaseManager.baseTitle,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
       // body: Center(child: Text(BaseManager.baseUrl)),
       body: _buildLaunchList(),
@@ -61,9 +70,7 @@ class _HomePageState extends State<HomePage> {
               } else if (state is LaunchLoaded) {
                 return _buildCard(context, state.launchesList);
               } else if (state is LaunchError) {
-                return Container(
-                  child: Text(state.message!),
-                );
+                return Text(state.message!);
               } else {
                 return Container();
               }
@@ -77,28 +84,33 @@ class _HomePageState extends State<HomePage> {
   Widget _buildLoading() => const Center(child: CircularProgressIndicator());
 
   Widget _buildCard(BuildContext context, LaunchesList model) {
-    return model.launches != []
-        ? ListView.builder(
-            itemCount: model.launches?.length,
-            itemBuilder: (context, index) {
-              return Container(
-                margin: const EdgeInsets.all(8.0),
-                child: Card(
-                  child: Container(
-                    margin: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: <Widget>[
-                        Text("A: ${model.launches?[index].details}"),
-                        Text("B: ${model.launches?[index].links?.patch?.large}"),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          )
-        : const Center(
-            child: CircularProgressIndicator(),
-          );
+    if (model.launches != [] && model.launches != null) {
+      LastLaunchModel? lastLaunch = _findNonNullRecord(model.launches!);
+      return lastLaunch != null
+          ? Center(
+              child: LatestLaunchCardComponent(
+                lastLaunch: lastLaunch,
+              ),
+            )
+          : const Center(child: Text("error"));
+    } else {
+      return Container();
+    }
   }
+}
+
+//* Function for find last nonNull record
+LastLaunchModel? _findNonNullRecord(List<LaunchModel> list) {
+  final reversedList = list.reversed;
+  for (var launchModel in reversedList) {
+    if (launchModel.dateUtc != null && launchModel.details != null && launchModel.name != null && launchModel.links?.patch?.small != null) {
+      return LastLaunchModel(
+          dateUtc: launchModel.dateUtc,
+          details: launchModel.details,
+          name: launchModel.name,
+          patchSmall: launchModel.links?.patch?.small,
+          patchLarge: launchModel.links?.patch?.large);
+    }
+  }
+  return null;
 }
