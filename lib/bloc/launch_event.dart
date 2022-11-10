@@ -8,3 +8,5 @@ abstract class LaunchEvent extends Equatable {
 }
 
 class GetLauchList extends LaunchEvent {}
+
+class PullToRefreshEvent extends LaunchEvent {}

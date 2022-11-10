@@ -41,7 +41,6 @@ class _HomePageState extends State<HomePage> {
           style: const TextStyle(color: Colors.white),
         ),
       ),
-      // body: Center(child: Text(BaseManager.baseUrl)),
       body: _buildLaunchList(),
     );
   }
@@ -56,7 +55,7 @@ class _HomePageState extends State<HomePage> {
             if (state is LaunchError) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.message!),
+                  content: Text(state.errorMessage!),
                 ),
               );
             }
@@ -68,9 +67,21 @@ class _HomePageState extends State<HomePage> {
               } else if (state is LaunchLoading) {
                 return _buildLoading();
               } else if (state is LaunchLoaded) {
-                return _buildCard(context, state.launchesList);
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    //* Delay for to see progress
+                    // await Future.delayed(const Duration(seconds: 2));
+                    context.read<LaunchBloc>().add(PullToRefreshEvent());
+                  },
+                  child: ListView.builder(
+                    itemCount: 1,
+                    itemBuilder: (BuildContext context, int index) {
+                      return _buildCard(context, state.launchesList);
+                    },
+                  ),
+                );
               } else if (state is LaunchError) {
-                return Text(state.message!);
+                return Text(state.errorMessage!);
               } else {
                 return Container();
               }

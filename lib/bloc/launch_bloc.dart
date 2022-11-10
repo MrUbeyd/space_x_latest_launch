@@ -10,17 +10,19 @@ class LaunchBloc extends Bloc<LaunchEvent, LaunchState> {
   LaunchBloc() : super(LaunchInitial()) {
     final ApiRepository apiRepository = ApiRepository();
 
-    on<GetLauchList>((event, emit) async {
-      try {
-        emit(LaunchLoading());
-        final launchList = await apiRepository.getAllLaunches();
-        emit(LaunchLoaded(launchList));
-        if (launchList.launches == []) {
-          emit(const LaunchError("Launch list is empty."));
+    on<LaunchEvent>((event, emit) async {
+      if (event is GetLauchList || event is PullToRefreshEvent) {
+        try {
+          emit(LaunchLoading());
+          final launchList = await apiRepository.getAllLaunches();
+          emit(LaunchLoaded(launchList));
+          if (launchList.launches == []) {
+            emit(const LaunchError("Launch list is empty."));
+          }
+        } on NetworkError {
+          emit(const LaunchError("Failed to fetch data."));
         }
-      } on NetworkError {
-        emit(const LaunchError("Failed to fetch data."));
-      }
+      } else {}
     });
   }
 }

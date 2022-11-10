@@ -17,6 +17,6 @@ class LaunchLoaded extends LaunchState {
 }
 
 class LaunchError extends LaunchState {
-  final String? message;
-  const LaunchError(this.message);
+  final String? errorMessage;
+  const LaunchError(this.errorMessage);
 }
